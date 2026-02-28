@@ -30,17 +30,20 @@
           "configurations": {
             "production": {
               "budgets": [
-                {
-                  "type": "initial",
-                  "maximumWarning": "500kB",
-                  "maximumError": "1MB"
-                },
-                {
-                  "type": "anyComponentStyle",
-                  "maximumWarning": "4kB",
-                  "maximumError": "8kB"
-                }
-              ],
+  {
+    "type": "initial",
+    "label": "bundle initial",
+    "maximumWarning": "1mb",  
+    "maximumError": "2mb"    
+  },
+  {
+    "type": "anyComponentStyle",
+    "label": "component styles",
+    "maximumWarning": "20kb", 
+    "maximumError": "30kb"   
+  }
+]
+              ,
               "outputHashing": "all"
             },
             "development": {
