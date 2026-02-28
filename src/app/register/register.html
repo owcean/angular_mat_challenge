@@ -1,0 +1,237 @@
+<div [class.dark]="darkMode" class="app-root">
+
+  <!-- PAGE HEADER -->
+  <div class="page-header">
+    <div class="header-inner">
+      <div class="header-brand">
+        <div class="brand-badge"><span class="material-icons">school</span></div>
+        <div>
+          <h1>HAU Event Portal</h1>
+          <p class="subtitle">Student Event Registration · AY 2025–2026</p>
+        </div>
+      </div>
+      <!-- REQUIREMENT 3: Dark/Light Toggle -->
+      <div class="theme-toggle" (click)="toggleDarkMode()">
+        <span class="material-icons">{{ darkMode ? 'light_mode' : 'dark_mode' }}</span>
+        <div class="toggle-track" [class.on]="darkMode">
+          <div class="toggle-thumb"></div>
+        </div>
+        <span class="toggle-label">{{ darkMode ? 'Light' : 'Dark' }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FORM CONTAINER -->
+  <div class="form-container">
+    <div class="form-card">
+
+      <form [formGroup]="formdata" (ngSubmit)="onClickSubmit(formdata.value)">
+
+        <!-- ── SECTION: Personal Info ── -->
+        <div class="section-divider"><span>Personal Information</span></div>
+
+        <!-- Full Name -->
+        <div class="mat-form-field">
+          <div class="mat-form-field-wrapper">
+            <label>Full Name *</label>
+            <input type="text" formControlName="fullName" placeholder="e.g. Juan Dela Cruz">
+            <div class="mat-form-field-underline"></div>
+          </div>
+          <div class="mat-error" [class.visible]="formdata.controls['fullName'].invalid && formdata.controls['fullName'].touched">
+            <span class="material-icons">error_outline</span> Full name is required.
+          </div>
+        </div>
+
+        <!-- Student ID -->
+        <div class="mat-form-field">
+          <div class="mat-form-field-wrapper">
+            <label>Student ID *</label>
+            <input type="text" formControlName="studentId" placeholder="e.g. 2021-00001">
+            <div class="mat-form-field-underline"></div>
+          </div>
+          <div class="mat-error" [class.visible]="formdata.controls['studentId'].invalid && formdata.controls['studentId'].touched">
+            <span class="material-icons">error_outline</span> Student ID is required.
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div class="mat-form-field">
+          <div class="mat-form-field-wrapper">
+            <label>Email Address *</label>
+            <input type="email" formControlName="email" placeholder="yourname@hau.edu.ph">
+            <div class="mat-form-field-underline"></div>
+          </div>
+          <div class="mat-error" [class.visible]="formdata.controls['email'].invalid && formdata.controls['email'].touched">
+            <span class="material-icons">error_outline</span> A valid email address is required.
+          </div>
+        </div>
+
+        <!-- REQUIREMENT 1: Password -->
+        <div class="mat-form-field">
+          <div class="mat-form-field-wrapper">
+            <label>Password *</label>
+            <input type="password" formControlName="password" placeholder="e.g. Student2024">
+            <div class="mat-form-field-underline"></div>
+          </div>
+          <div class="mat-error" [class.visible]="formdata.controls['password'].invalid && formdata.controls['password'].touched">
+            <span class="material-icons">error_outline</span> {{ getPasswordError() }}
+          </div>
+          <div class="field-hint">
+            <span class="material-icons hint-icon">info_outline</span>
+            Letters &amp; numbers only · must start with a letter · min. 8 characters
+          </div>
+        </div>
+
+        <!-- Gender radio -->
+        <div class="radio-group">
+          <span class="radio-label">Gender *</span>
+          <div class="gender-radio-group">
+            <label class="mat-radio-button"><input type="radio" formControlName="gender" value="male"> Male</label>
+            <label class="mat-radio-button"><input type="radio" formControlName="gender" value="female"> Female</label>
+            <label class="mat-radio-button"><input type="radio" formControlName="gender" value="prefer_not"> Prefer not to say</label>
+          </div>
+        </div>
+
+        <!-- REQUIREMENT 2: Birth Date — 2006 or earlier -->
+        <div class="mat-form-field">
+          <div class="mat-form-field-wrapper date-wrapper">
+            <label>Date of Birth * <span class="field-badge">Born 2006 or earlier</span></label>
+            <input type="date" formControlName="birthDate" max="2006-12-31">
+            <span class="mat-suffix material-icons">calendar_today</span>
+            <div class="mat-form-field-underline"></div>
+          </div>
+          <div class="mat-error" [class.visible]="formdata.controls['birthDate'].invalid && formdata.controls['birthDate'].touched">
+            <span class="material-icons">error_outline</span> {{ getBirthDateError() }}
+          </div>
+        </div>
+
+        <!-- ── SECTION: Academic Info ── -->
+        <div class="section-divider"><span>Academic Information</span></div>
+
+        <!-- mat-select: Course -->
+        <div class="mat-form-field" (click)="$event.stopPropagation()">
+          <div class="mat-select-wrapper"
+            [class.open]="courseSelectOpen"
+            [class.filled]="selectedCourse"
+            (click)="toggleCourseSelect($event)">
+            <label>Course / Program *</label>
+            <div class="mat-select-trigger">
+              <span [class.placeholder]="!selectedCourse">{{ selectedCourse || 'Select your course' }}</span>
+              <span class="material-icons mat-select-arrow">arrow_drop_down</span>
+            </div>
+            <div class="mat-form-field-underline"></div>
+            <div class="mat-select-panel">
+              <div *ngFor="let c of courses" class="mat-option"
+                [class.selected]="selectedCourse === c"
+                (click)="selectCourse($event, c)">{{ c }}</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Year Level radio -->
+        <div class="radio-group">
+          <span class="radio-label">Year Level *</span>
+          <div class="year-radio-group">
+            <label class="mat-radio-button" *ngFor="let yr of ['1st Year','2nd Year','3rd Year','4th Year','Graduate']">
+              <input type="radio" formControlName="yearLevel" [value]="yr"> {{ yr }}
+            </label>
+          </div>
+        </div>
+
+        <!-- ── SECTION: Event Preferences ── -->
+        <div class="section-divider"><span>Event Preferences</span></div>
+
+        <!-- mat-chip: Event Interests -->
+        <div class="mat-chip-section">
+          <span class="mat-chip-section-label">
+            Events You're Interested In
+            <span class="mat-tooltip-host">
+              <span class="material-icons" style="font-size:14px;cursor:help;">help_outline</span>
+              <span class="mat-tooltip">Select all that apply</span>
+            </span>
+          </span>
+          <div class="mat-chip-list">
+            <div *ngFor="let type of allEventTypes"
+              class="mat-chip" [class.active]="isChipActive(type)"
+              (click)="toggleChip(type)">
+              {{ type }}
+              <span *ngIf="isChipActive(type)" class="chip-remove material-icons"
+                (click)="removeChip($event, type)">close</span>
+            </div>
+          </div>
+          <div class="chip-hint">Click chips to select the types of events you enjoy attending</div>
+        </div>
+
+        <!-- mat-slider: Experience -->
+        <div class="slider-group">
+          <div class="slider-header">
+            <span class="slider-label">Event Participation Experience</span>
+            <span class="slider-value-badge">{{ formdata.get('eventExperience')?.value }}</span>
+          </div>
+          <div class="slider-scale"><span>Beginner</span><span>Expert</span></div>
+          <input type="range" formControlName="eventExperience"
+            [min]="minExp" [max]="maxExp" step="1"
+            [style.background]="'linear-gradient(to right, var(--accent) ' + sliderFillPercent + '%, var(--slider-track) ' + sliderFillPercent + '%)'">
+        </div>
+
+        <!-- mat-progress-bar: Completion -->
+        <div class="progress-section">
+          <div class="progress-label">
+            Form Completion
+            <span class="progress-pct">{{ profileCompletion }}%</span>
+          </div>
+          <div class="mat-progress-bar">
+            <div class="mat-progress-bar-fill" [style.width.%]="profileCompletion"></div>
+          </div>
+          <div class="progress-hint">
+            {{ profileCompletion === 100 ? '✓ All fields complete — ready to submit!' : 'Fill in all required fields to enable submission' }}
+          </div>
+        </div>
+
+        <!-- Checkbox: Terms -->
+        <div class="checkbox-group">
+          <label class="mat-checkbox" [class.checked]="formdata.controls['agreeToTerms'].value">
+            <input type="checkbox" formControlName="agreeToTerms">
+            <span class="checkbox-box"><span class="material-icons check-icon">check</span></span>
+            <span class="checkbox-label">
+              I agree to the <a href="#" class="terms-link">Terms &amp; Conditions</a> and confirm all information is accurate.
+            </span>
+          </label>
+        </div>
+
+        <!-- Submit -->
+        <span class="mat-tooltip-host" style="display:block;">
+          <button type="submit" class="mat-raised-button" [disabled]="!formdata.valid">
+            <span class="material-icons btn-icon">how_to_reg</span>
+            Register for Event
+          </button>
+          <span class="mat-tooltip">
+            {{ formdata.valid ? 'Submit your registration' : 'Complete all required fields first' }}
+          </span>
+        </span>
+
+      </form>
+
+      <!-- SUBMITTED RESULT CARD -->
+      <div class="submitted-info" [class.visible]="submitted">
+        <div class="submitted-header">
+          <span class="material-icons">check_circle</span>
+          <span>Registration Submitted Successfully!</span>
+        </div>
+        <div class="submitted-body">
+          <div class="submitted-row"><span class="submitted-key">Full Name</span><span class="submitted-val">{{ fullName || '—' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Student ID</span><span class="submitted-val">{{ studentId || '—' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Email</span><span class="submitted-val">{{ email }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Password</span><span class="submitted-val">{{ password ? '•'.repeat(password.length) : '—' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Gender</span><span class="submitted-val">{{ gender || '—' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Birth Date</span><span class="submitted-val">{{ birthDate | date:'mediumDate' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Course</span><span class="submitted-val">{{ course || '—' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Year Level</span><span class="submitted-val">{{ yearLevel || '—' }}</span></div>
+          <div class="submitted-row"><span class="submitted-key">Experience</span><span class="submitted-val">{{ eventExperience }} / 10</span></div>
+          <div class="submitted-row full"><span class="submitted-key">Event Interests</span><span class="submitted-val">{{ activeEventTypes.size > 0 ? activeEventTypesArray.join(', ') : '—' }}</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
