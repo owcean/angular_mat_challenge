@@ -32,15 +32,13 @@
               "budgets": [
   {
     "type": "initial",
-    "label": "bundle initial",
-    "maximumWarning": "1mb",  
-    "maximumError": "2mb"    
+    "maximumWarning": "1mb",
+    "maximumError": "2mb"
   },
   {
     "type": "anyComponentStyle",
-    "label": "component styles",
-    "maximumWarning": "20kb", 
-    "maximumError": "30kb"   
+    "maximumWarning": "20kb",
+    "maximumError": "30kb"
   }
 ]
               ,
